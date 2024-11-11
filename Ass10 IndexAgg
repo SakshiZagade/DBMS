@@ -1,0 +1,68 @@
+Here's a summary of the MongoDB operations you performed along with brief explanations:
+
+1. **Insert Documents into `stinfo` Collection:**
+
+   db.stinfo.insert({name:'abc', branch:'computer',city:'mumbai',marks:80,class:'I'});
+   db.stinfo.insert({name:'pqr', branch:'IT',city:'pune',marks:55,class:'II'});
+   db.stinfo.insert({name:'def', branch:'E&TC',city:'mumbai',marks:60,class:'II'});
+   db.stinfo.insert({name:'xyz', branch:'E&TC2',city:'goa',marks:30,class:'II'});
+   ```
+
+2. **Find a Document by Name with `explain()`:**
+   - This shows the execution plan for the query.
+
+   db.stinfo.find({name:"pqr"}).explain();
+   ```
+
+3. **Create an Index on the `name` Field:**
+   - Indexes speed up search queries on specific fields.
+   ```javascript
+   db.stinfo.createIndex({"name":1});
+   ```
+
+4. **Find a Document by Name with `explain()` After Indexing:**
+   - This shows how MongoDB uses the index for faster search.
+
+   db.stinfo.find({name:"xyz"}).explain();
+   ```
+
+5. **Create an Index on the `branch` Field:**
+ 
+   db.stinfo.createIndex({"branch":1});
+   ```
+
+6. **List All System Indexes:**
+   - Displays all indexes in the `StudDb.stinfo` collection.
+
+   db.system.indexes.find();
+   ```
+
+7. **Drop the Index on the `branch` Field:**
+   - Removes the `branch` index to save space or if no longer needed.
+   ```javascript
+   db.stinfo.dropIndex({"branch":1});
+   ```
+
+8. **Sort Collection by `name`:**
+   - Retrieves documents in ascending order by `name`.
+  
+   db.stinfo.find().sort({name:1});
+   ```
+
+9. **Sort Collection by `name` and `class`:**
+   - Retrieves documents sorted first by `name`, then by `class`.
+
+   db.stinfo.find().sort({name:1,class:1});
+   ```
+
+10. **Find Students with Marks Between 40 and 60:**
+   - Uses `$gt` (greater than) and `$lt` (less than) operators.
+  
+   db.stinfo.find({marks:{$gt:40 ,$lt:60}});
+   ```
+
+11. **Find First-Year Computer Students from Mumbai:**
+   - Matches students with specific `city`, `branch`, and `class`.
+   ```javascript
+   db.stinfo.find({city:"mumbai", branch:'computer',class:'I'});
+   ```
