@@ -1,0 +1,73 @@
+CREATE DATABASE LibrarySystem;
+
+USE LibrarySystem;
+
+CREATE TABLE Borrower (
+    Roll_no INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Date_of_Issue DATE,
+    Name_of_Book VARCHAR(100),
+    Status VARCHAR(10)
+);
+
+CREATE TABLE Fine (
+    Roll_no INT,
+    Date DATE,
+    Amt DECIMAL(10, 2),
+    FOREIGN KEY (Roll_no) REFERENCES Borrower(Roll_no)
+);
+
+INSERT INTO Borrower (Roll_no, Name, Date_of_Issue, Name_of_Book, Status) VALUES
+    (101, 'Alice', '2023-09-01', 'Introduction to SQL', 'Borrowed'),
+    (102, 'Bob', '2023-09-10', 'Learning Python', 'Borrowed'),
+    (103, 'Charlie', '2023-09-20', 'Data Structures', 'Returned'),
+    (104, 'David', '2023-10-01', 'Algorithms', 'Borrowed'),
+    (105, 'Eva', '2023-10-05', 'Computer Networks', 'Borrowed');
+
+DELIMITER //
+
+CREATE PROCEDURE CalculateFine(IN in_roll_no INT, IN in_name_of_book VARCHAR(100))
+BEGIN
+    DECLARE issue_date DATE;
+    DECLARE days_borrowed INT;
+    DECLARE fine_amount DECIMAL(10, 2);
+    DECLARE today DATE DEFAULT CURDATE();
+    
+    -- Exception handling for no record found
+    DECLARE CONTINUE HANDLER FOR NOT FOUND 
+        SET fine_amount = NULL;
+
+    -- Retrieve the issue date for the specified Roll_no and Name_of_Book
+    SELECT Date_of_Issue INTO issue_date
+    FROM Borrower
+    WHERE Roll_no = in_roll_no AND Name_of_Book = in_name_of_book
+    AND Status = 'Borrowed';
+
+    -- Check if the book was found
+    IF issue_date IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Record not found or book already returned.';
+    ELSE
+        -- Calculate the number of days the book has been borrowed
+        SET days_borrowed = DATEDIFF(today, issue_date);
+
+        -- Calculate fine based on the number of days
+        IF days_borrowed BETWEEN 15 AND 30 THEN
+            SET fine_amount = days_borrowed * 5;
+        ELSEIF days_borrowed > 30 THEN
+            SET fine_amount = days_borrowed * 50;
+        ELSE
+            SET fine_amount = 0;
+        END IF;
+
+        -- Insert or update the Fine table with calculated fine
+        INSERT INTO Fine (Roll_no, Date, Amt)
+        VALUES (in_roll_no, today, fine_amount)
+        ON DUPLICATE KEY UPDATE Amt = fine_amount;
+    END IF;
+END //
+
+DELIMITER ;
+
+CALL CalculateFine(101, 'Introduction to SQL');
+
+SELECT * FROM Fine;
