@@ -1,0 +1,69 @@
+CREATE DATABASE StudentResults;
+
+USE StudentResults;
+
+CREATE TABLE Stud_Marks (
+    Roll INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Total_Marks INT
+);
+
+CREATE TABLE Result (
+    Roll INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Class VARCHAR(50),
+    FOREIGN KEY (Roll) REFERENCES Stud_Marks(Roll)
+);
+
+INSERT INTO Stud_Marks (Roll, Name, Total_Marks) VALUES
+    (101, 'Alice', 1450),
+    (102, 'Bob', 980),
+    (103, 'Charlie', 915),
+    (104, 'David', 880),
+    (105, 'Eva', 840);
+
+DELIMITER //
+
+CREATE PROCEDURE proc_Grade()
+BEGIN
+    DECLARE grade VARCHAR(50);
+
+    -- Cursor to iterate through each student and categorize based on marks
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE student_roll INT;
+    DECLARE student_name VARCHAR(100);
+    DECLARE student_marks INT;
+    DECLARE student_cursor CURSOR FOR SELECT Roll, Name, Total_Marks FROM Stud_Marks;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- Open the cursor and categorize each student
+    OPEN student_cursor;
+    FETCH student_cursor INTO student_roll, student_name, student_marks;
+
+    WHILE NOT done DO
+        IF student_marks BETWEEN 990 AND 1500 THEN
+            SET grade = 'Distinction';
+        ELSEIF student_marks BETWEEN 900 AND 989 THEN
+            SET grade = 'First Class';
+        ELSEIF student_marks BETWEEN 825 AND 899 THEN
+            SET grade = 'Higher Second Class';
+        ELSE
+            SET grade = 'No Category';
+        END IF;
+
+        -- Insert the result into the Result table
+        INSERT INTO Result (Roll, Name, Class) VALUES (student_roll, student_name, grade)
+        ON DUPLICATE KEY UPDATE Class = grade;
+
+        FETCH student_cursor INTO student_roll, student_name, student_marks;
+    END WHILE;
+
+    -- Close the cursor
+    CLOSE student_cursor;
+END //
+
+DELIMITER ;
+
+CALL proc_Grade();
+
+SELECT * FROM Result;
