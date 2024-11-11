@@ -1,0 +1,24 @@
+Create orders Collection with customer_id, item, and quantity Fields You need to specify the collection name (orders) explicitly in the insert statements. Also, include customer_id:
+
+
+db.orders.insert({customer_id: 1, item: 'cpu', quantity: 20});
+db.orders.insert({customer_id: 2, item: 'keyboard', quantity: 30});
+db.orders.insert({customer_id: 1, item: 'cpu', quantity: 40});
+db.orders.insert({customer_id: 3, item: 'mouse', quantity: 30});
+Define the Map Function to Emit item and quantity for MapReduce:
+
+
+var mapfunction = function() { emit(this.item, this.quantity); };
+Define the Reduce Function to Sum Quantities by Item:
+
+
+var reducefunction = function(keys, values) { return Array.sum(values); };
+Run the MapReduce Operation:
+
+
+db.orders.mapReduce(mapfunction, reducefunction, { out: 'Result' });
+Check Results: After running mapReduce, use the following to view the results:
+
+
+
+db.Result.find();
