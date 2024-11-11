@@ -1,0 +1,138 @@
+CREATE DATABASE SupplyChain;
+
+USE SupplyChain;
+
+CREATE TABLE supplier (
+    suppl_no INT PRIMARY KEY,
+    suppl_name VARCHAR(100),
+    city VARCHAR(50),
+    status INT
+);
+
+CREATE TABLE parts (
+    part_no VARCHAR(10) PRIMARY KEY,
+    part_name VARCHAR(100),
+    color VARCHAR(20),
+    weight DECIMAL(5, 2),
+    city VARCHAR(50)
+);
+
+CREATE TABLE shipment (
+    suppl_no INT,
+    part_no VARCHAR(10),
+    quantity INT,
+    FOREIGN KEY (suppl_no) REFERENCES supplier(suppl_no),
+    FOREIGN KEY (part_no) REFERENCES parts(part_no)
+);
+
+CREATE TABLE project (
+    project_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    location VARCHAR(50)
+);
+
+INSERT INTO supplier (suppl_no, suppl_name, city, status) VALUES
+    (1, 'Supplier A', 'Chennai', 30),
+    (2, 'Supplier B', 'Mumbai', 40),
+    (3, 'Supplier C', 'Pune', 25),
+    (4, 'Supplier D', 'Chennai', 35),
+    (5, 'Supplier E', 'Delhi', 50),
+    (6, 'Supplier F', 'Bangalore', 20);
+
+INSERT INTO parts (part_no, part_name, color, weight, city) VALUES
+    ('P1', 'Part A', 'Red', 5.5, 'Chennai'),
+    ('P2', 'Part B', 'Blue', 3.2, 'Mumbai'),
+    ('P3', 'Part C', 'Green', 4.0, 'Pune'),
+    ('P4', 'Part D', 'Red', 2.8, 'Delhi'),
+    ('P5', 'Part E', 'Blue', 6.1, 'Bangalore'),
+    ('P6', 'Part F', 'Yellow', 5.0, 'Chennai');
+
+INSERT INTO shipment (suppl_no, part_no, quantity) VALUES
+    (1, 'P1', 100),
+    (2, 'P2', 200),
+    (3, 'P3', 150),
+    (4, 'P4', 100),
+    (5, 'P5', 250),
+    (6, 'P6', 300);
+
+INSERT INTO project (project_id, name, location) VALUES
+    (101, 'Project X', 'Chennai'),
+    (102, 'Project Y', 'Mumbai'),
+    (103, 'Project Z', 'Delhi'),
+    (104, 'Project W', 'Pune'),
+    (105, 'Project V', 'Bangalore'),
+    (106, 'Project U', 'Chennai');
+
+1. Create Index on supplier Using suppl_no Attribute:
+CREATE INDEX idx_suppl_no ON supplier(suppl_no);
+
+2. Create Index on supplier Using suppl_name Attribute:
+CREATE INDEX idx_suppl_name ON supplier(suppl_name);
+
+3. Show All Indexes on supplier Table:
+SHOW INDEX FROM supplier;
+
+4. Drop Index suppl_name from supplier Table:
+DROP INDEX idx_suppl_name ON supplier;
+
+5-8 repeat 1-4
+
+9. Create a View for Suppliers in Chennai with status > 25:
+CREATE VIEW ChennaiSuppliers AS
+SELECT * FROM supplier WHERE city = 'Chennai' AND status > 25;
+
+10. Insert New Record in View for Chennai Supplier:
+INSERT INTO ChennaiSuppliers (suppl_no, suppl_name, city, status)
+VALUES (7, 'Supplier G', 'Chennai', 30);
+
+-CREATE VIEW suppl_pune AS
+SELECT * 
+FROM supplier 
+WHERE city = 'Pune';
+
+-SELECT * FROM suppl_pune;
+
+11. Drop a View suppl_pune:
+DROP VIEW IF EXISTS suppl_pune;
+
+12. Perform an Inner Join on supplier and parts on city:
+SELECT supplier.suppl_no, supplier.suppl_name, parts.part_no, parts.part_name
+FROM supplier
+INNER JOIN parts ON supplier.city = parts.city;
+
+13. Perform Left Outer Join on shipment and project:
+SELECT shipment.suppl_no, shipment.part_no, project.project_id, project.name
+FROM shipment
+LEFT JOIN project ON shipment.suppl_no = project.project_id;
+
+14. Perform Right Outer Join on shipment and project:
+SELECT shipment.suppl_no, shipment.part_no, project.project_id, project.name
+FROM shipment
+RIGHT JOIN project ON shipment.suppl_no = project.project_id;
+
+15. Perform Natural Inner Join on supplier and parts on city:
+SELECT * FROM supplier NATURAL JOIN parts WHERE supplier.city = parts.city;
+
+16. Perform Natural Left Outer Join on shipment and project:
+SELECT * FROM shipment NATURAL LEFT JOIN project;
+
+17. Perform Natural Right Outer Join on shipment and project:
+SELECT * FROM shipment NATURAL RIGHT JOIN project;
+
+18. Get Full Supplier Information for Supplier Who Supplies Part P2:
+SELECT supplier.*
+FROM supplier
+JOIN shipment ON supplier.suppl_no = shipment.suppl_no
+WHERE shipment.part_no = 'P2';
+
+19. Get Supplier Names for Suppliers Who Supply at Least One Red Part:
+SELECT DISTINCT supplier.suppl_name
+FROM supplier
+JOIN shipment ON supplier.suppl_no = shipment.suppl_no
+JOIN parts ON shipment.part_no = parts.part_no
+WHERE parts.color = 'Red';
+
+20. Perform GROUP BY on Part Number to Calculate Total Quantity:
+SELECT part_no, SUM(quantity) AS total_quantity
+FROM shipment
+GROUP BY part_no;
