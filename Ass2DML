@@ -1,0 +1,211 @@
+CREATE DATABASE University;
+
+USE University;
+
+-- Create department table
+CREATE TABLE department (
+    dept_name VARCHAR(50) PRIMARY KEY,
+    building VARCHAR(50),
+    budget DECIMAL(10, 2)
+);
+
+-- Create course table with foreign key reference to department
+CREATE TABLE course (
+    course_id VARCHAR(10) PRIMARY KEY,
+    title VARCHAR(100),
+    dept_name VARCHAR(50),
+    credits INT,
+    FOREIGN KEY (dept_name) REFERENCES department(dept_name)
+);
+
+-- Create instructor table with foreign key reference to department
+CREATE TABLE instructor (
+    Id VARCHAR(10) PRIMARY KEY,
+    name VARCHAR(100),
+    dept_name VARCHAR(50),
+    salary DECIMAL(10, 2),
+    FOREIGN KEY (dept_name) REFERENCES department(dept_name)
+);
+
+-- Create section table with foreign key reference to course
+CREATE TABLE section (
+    course_id VARCHAR(10),
+    section_id VARCHAR(10),
+    semester VARCHAR(10),
+    year INT,
+    building VARCHAR(50),
+    room_no VARCHAR(10),
+    time_slot VARCHAR(20),
+    PRIMARY KEY (course_id, section_id, semester, year),
+    FOREIGN KEY (course_id) REFERENCES course(course_id)
+);
+
+-- Create teaches table with foreign key references to instructor and section
+CREATE TABLE teaches (
+    Id VARCHAR(10),
+    course_id VARCHAR(10),
+    section_id VARCHAR(10),
+    semester VARCHAR(10),
+    year INT,
+    PRIMARY KEY (Id, course_id, section_id, semester, year),
+    FOREIGN KEY (Id) REFERENCES instructor(Id),
+    FOREIGN KEY (course_id) REFERENCES course(course_id)
+);
+
+-- Departments with different budgets
+INSERT INTO department (dept_name, building, budget) VALUES 
+    ('Physics', 'Physics Building', 25000),
+    ('Biology', 'Biology Building', 30000),
+    ('Computer Science', 'CS Building', 50000),
+    ('Music', 'Music Building', 12000);
+
+-- Courses offered by different departments
+INSERT INTO course (course_id, title, dept_name, credits) VALUES 
+    ('PH101', 'Quantum Mechanics', 'Physics', 4),
+    ('PH102', 'Classical Mechanics', 'Physics', 3),
+    ('BIO101', 'Genetics', 'Biology', 4),
+    ('BIO102', 'Ecology', 'Biology', 3),
+    ('CS101', 'Algorithms', 'Computer Science', 4),
+    ('CS102', 'Databases', 'Computer Science', 3),
+    ('MU101', 'Music Theory', 'Music', 2),
+    ('MU102', 'Music History', 'Music', 3);
+
+-- Instructors with different salaries in various departments
+INSERT INTO instructor (Id, name, dept_name, salary) VALUES 
+    ('1001', 'Alice Johnson', 'Physics', 95000),
+    ('1002', 'Bob Smith', 'Physics', 88000),
+    ('2001', 'Charles Darwin', 'Biology', 91000),
+    ('2002', 'Diana Prince', 'Biology', 105000),
+    ('3001', 'Evan Turner', 'Computer Science', 100000),
+    ('3002', 'Fay Jackson', 'Computer Science', 120000),
+    ('4001', 'Grace Hopper', 'Music', 18000),
+    ('4002', 'Helen Wong', 'Geology', 85000);
+
+-- Course sections offered in different semesters and years
+INSERT INTO section (course_id, section_id, semester, year, building, room_no, time_slot) VALUES 
+    ('PH101', 'S01', 'Winter', 2023, 'Physics Building', '101', '09:00-10:30'),
+    ('PH102', 'S02', 'Summer', 2023, 'Physics Building', '102', '11:00-12:30'),
+    ('BIO101', 'S01', 'Winter', 2023, 'Biology Building', '201', '13:00-14:30'),
+    ('BIO102', 'S01', 'Summer', 2023, 'Biology Building', '202', '15:00-16:30'),
+    ('CS101', 'S01', 'Winter', 2023, 'CS Building', '301', '10:00-11:30'),
+    ('CS102', 'S02', 'Summer', 2023, 'CS Building', '302', '12:00-13:30'),
+    ('MU101', 'S01', 'Winter', 2023, 'Music Building', '401', '09:00-10:30');
+
+-- Instructors teaching different courses in specific sections and semesters
+INSERT INTO teaches (Id, course_id, section_id, semester, year) VALUES 
+    ('1001', 'PH101', 'S01', 'Winter', 2023),
+    ('1002', 'PH102', 'S02', 'Summer', 2023),
+    ('2001', 'BIO101', 'S01', 'Winter', 2023),
+    ('2002', 'BIO102', 'S01', 'Summer', 2023),
+    ('3001', 'CS101', 'S01', 'Winter', 2023),
+    ('3002', 'CS102', 'S02', 'Summer', 2023),
+    ('4001', 'MU101', 'S01', 'Winter', 2023);
+
+1. Select the names of instructors in the Physics department in alphabetical order:
+SELECT name
+FROM instructor
+WHERE dept_name = 'Physics'
+ORDER BY name ASC;
+
+2. List all instructors in descending order of salary:
+SELECT *
+FROM instructor
+ORDER BY salary DESC;
+
+3. Find the names of instructors with a salary between Rs.90,000 and Rs.100,000:
+SELECT name
+FROM instructor
+WHERE salary BETWEEN 90000 AND 100000;
+
+4. Find names of instructors in the Biology department who have taught a course:
+SELECT DISTINCT instructor.name, course.title
+FROM instructor
+JOIN teaches ON instructor.Id = teaches.Id
+JOIN course ON teaches.course_id = course.course_id
+WHERE instructor.dept_name = 'Biology';
+
+5. Find courses taught in either Summer or Winter semester:
+SELECT DISTINCT course_id
+FROM section
+WHERE semester IN ('Summer', 'Winter');
+
+6. Find the average salary of instructors in the Computer Science department:
+SELECT AVG(salary) AS avg_salary
+FROM instructor
+WHERE dept_name = 'Computer Science';
+
+7. Find the total number of instructors teaching courses in the Winter semester:
+SELECT COUNT(DISTINCT Id) AS total_instructors
+FROM teaches
+WHERE semester = 'Winter';
+
+8. Find the average salary of all instructors:
+SELECT AVG(salary) AS avg_salary
+FROM instructor;
+
+9. Insert into the Geology department with a budget of more than Rs.10,000:
+INSERT INTO department (dept_name, building, budget) 
+VALUES ('Geology', 'Geo-Building', 15000);
+
+10. Insert an instructor in the Music department with a salary of Rs.18,000:
+INSERT INTO instructor (Id, name, dept_name, salary) 
+VALUES ('5001', 'John Doe', 'Music', 18000);
+
+11. Add a joining_date column to the instructor table:
+ALTER TABLE instructor
+ADD joining_date DATE;
+
+12. Update joining_date for the instructor with Id = '12121':
+UPDATE instructor
+SET joining_date = '2024-01-15'
+WHERE Id = '12121';
+
+13. Delete joining_date column from instructor:
+ALTER TABLE instructor
+DROP COLUMN joining_date;
+
+14. Update the salary of all instructors by 5%:
+UPDATE instructor
+SET salary = salary * 1.05;
+
+15. Update salary by 5% if greater than Rs.10,00,000, otherwise increase by 3%:
+UPDATE instructor
+SET salary = CASE
+    WHEN salary > 1000000 THEN salary * 1.05
+    ELSE salary * 1.03
+END;
+
+16. Delete instructor with Id = '15151' and use ON DELETE CASCADE
+DELETE FROM instructor
+WHERE Id = '15151';
+-- Ensure the foreign key in related tables is set to ON DELETE CASCADE
+
+17. Update name of an instructor by ID:
+UPDATE instructor
+SET name = 'New Name'
+WHERE Id = '12345';
+
+18. Find the instructor with the maximum salary:
+SELECT name, salary
+FROM instructor
+WHERE salary = (SELECT MAX(salary) FROM instructor);
+
+19. Delete all records from the section table:
+DELETE FROM section;
+
+20. Find instructors earning less than the average salary:
+SELECT name, salary
+FROM instructor
+WHERE salary < (SELECT AVG(salary) FROM instructor);
+
+21. Find the maximum and minimum salary amounts:
+SELECT MAX(salary) AS max_salary, MIN(salary) AS min_salary
+FROM instructor;
+
+22. Delete instructor with Id = '15151' from teaches and use ON DELETE CASCADE:
+DELETE FROM teaches
+WHERE Id = '15151';
+
+#SELECT * FROM TABLE - for seeing the table contents
+#DESC TABLE - for seeing the structure of table
+#DROP DATABASE/TABLE - to delete
