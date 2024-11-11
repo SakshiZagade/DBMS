@@ -1,0 +1,75 @@
+Here is the corrected code for creating the `ProcGrade` stored procedure and inserting records with correct formatting:
+
+```sql
+-- Connect to MariaDB and start the necessary services
+service mysqld start
+mysql -u root -p
+
+-- Creating the database
+CREATE DATABASE Mycollege;
+USE Mycollege;
+
+-- Creating the tables
+CREATE TABLE stud_marks (
+    roll_no INT PRIMARY KEY,
+    name VARCHAR(20),
+    total_marks INT
+);
+
+CREATE TABLE result (
+    roll_no INT,
+    grade VARCHAR(30)
+);
+
+-- Setting the delimiter for stored procedure
+DELIMITER $$
+
+-- Creating the stored procedure
+CREATE PROCEDURE ProcGrade(
+    IN roll_no INT,
+    IN name VARCHAR(20),
+    IN total_marks INT
+)
+BEGIN
+    DECLARE grade VARCHAR(30);
+
+    -- Determining the grade based on total_marks
+    IF total_marks <= 1500 AND total_marks >= 990 THEN
+        SET grade := 'Distinction';
+    ELSEIF total_marks <= 989 AND total_marks >= 900 THEN
+        SET grade := 'First Class';
+    ELSEIF total_marks <= 899 AND total_marks >= 825 THEN
+        SET grade := 'Higher Second Class';
+    ELSE
+        SET grade := 'No Grade';
+    END IF;
+
+    -- Inserting values into stud_marks and result tables
+    INSERT INTO stud_marks (roll_no, name, total_marks) VALUES (roll_no, name, total_marks);
+    INSERT INTO result (roll_no, grade) VALUES (roll_no, grade);
+END $$
+
+-- Resetting the delimiter
+DELIMITER ;
+
+-- Calling the stored procedure
+CALL ProcGrade(27, 'Ketki', 1030);
+CALL ProcGrade(29, 'Kajal', 980);
+
+-- Verifying the data in stud_marks and result tables
+SELECT * FROM stud_marks;
+SELECT * FROM result;
+```
+
+### Explanation of Key Sections
+1. **Stored Procedure Creation (`ProcGrade`)**:
+   - The procedure `ProcGrade` takes `roll_no`, `name`, and `total_marks` as inputs.
+   - The `grade` variable is declared to store the result based on `total_marks`.
+   - The `IF` conditions determine the appropriate grade.
+
+2. **Inserting Data**:
+   - Records are inserted into `stud_marks` and `result` tables based on the inputs.
+
+3. **Testing**:
+   - Two calls to `ProcGrade` insert records with `roll_no` 27 (Ketki) and 29 (Kajal).
+   - After each insertion, `SELECT` statements confirm the data in `stud_marks` and `result`.
