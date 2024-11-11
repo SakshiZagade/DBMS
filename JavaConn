@@ -174,3 +174,87 @@ The program will show a menu asking you to choose an operation (View, Add, Edit,
 You can enter the necessary details as requested by the program.
 Step 4: Verify the Database
 You can verify that the records have been added, edited, or deleted by checking the Students table in MySQL.
+
+import java.sql.*;
+import java.io.*;
+public class MysqlJavaCon {
+
+   public static void main(String[] args) throws Exception {
+        try {
+               int ch,ans=0,id,mrk,per;
+               String name;
+            do
+               {
+           Class.forName("com.mysql.jdbc.Driver");
+       
+           Connection con = DriverManager.getConnection(
+               "jdbc:mysql://localhost:3306/college","TEcomp","Bvcoew@123");
+               Statement stmt=con.createStatement();
+               PreparedStatement preparedStatement = null;
+               preparedStatement = con.prepareStatement("insert into college.student values (?, ?, ?, ?)");
+               System.out.println("1:Display Table " );
+               System.out.println("2: Insert in table " );
+            BufferedReader bufr=new BufferedReader(new InputStreamReader(System.in));
+               System.out.println("Ente choice :");
+               ch=Integer.parseInt(bufr.readLine());
+               
+               switch(ch)
+               {
+               case 1:
+               ResultSet rs=stmt.executeQuery("select * from student");
+                   while(rs.next())
+                   {
+                   System.out.println(rs.getInt(1)+" "+rs.getString(2)+" "+rs.getInt(3)+" "+rs.getInt(4));}
+               
+               break;
+               case 2:
+                   System.out.println("Ente student id :");
+                   id=Integer.parseInt(bufr.readLine());
+                   System.out.println("Ente student name :");
+                   name=bufr.readLine();
+                   mrk=Integer.parseInt(bufr.readLine());
+                   System.out.println("Ente Per :");
+                   per=Integer.parseInt(bufr.readLine());
+                   preparedStatement.setInt(1, id);
+                   preparedStatement.setString(2, name);
+                   preparedStatement.setInt(3, mrk);
+                   preparedStatement.setInt(4, per);
+                   preparedStatement.executeUpdate();
+                   break;
+                   
+                   
+               }
+               System.out.println("Do you wnat to continue [no-0/yes-1] :");
+               ans=Integer.parseInt(bufr.readLine());
+               }while(ans==1);
+               }    
+           catch(Exception e){
+               System.out.print(e);
+           }    
+       
+
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
