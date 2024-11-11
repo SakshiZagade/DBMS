@@ -1,0 +1,176 @@
+CREATE DATABASE SchoolDB;
+
+USE SchoolDB;
+
+CREATE TABLE Students (
+    student_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50),
+    age INT,
+    grade VARCHAR(10)
+);
+
+INSERT INTO Students (name, age, grade) VALUES
+    ('Alice', 20, 'A'),
+    ('Bob', 19, 'B'),
+    ('Charlie', 22, 'A'),
+    ('David', 21, 'C'),
+    ('Eva', 20, 'B');
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class StudentDatabaseNavigation {
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/SchoolDB";
+    private static final String DB_USER = "root";
+    private static final String DB_PASSWORD = "your_password";
+
+    public static void main(String[] args) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             Scanner scanner = new Scanner(System.in)) {
+
+            while (true) {
+                System.out.println("\nDatabase Navigation Menu:");
+                System.out.println("1. View All Students");
+                System.out.println("2. Add Student");
+                System.out.println("3. Edit Student");
+                System.out.println("4. Delete Student");
+                System.out.println("5. Exit");
+
+                System.out.print("Choose an option: ");
+                int choice = scanner.nextInt();
+
+                switch (choice) {
+                    case 1 -> viewAllStudents(conn);
+                    case 2 -> addStudent(conn, scanner);
+                    case 3 -> editStudent(conn, scanner);
+                    case 4 -> deleteStudent(conn, scanner);
+                    case 5 -> {
+                        System.out.println("Exiting...");
+                        return;
+                    }
+                    default -> System.out.println("Invalid choice. Try again.");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Database connection error: " + e.getMessage());
+        }
+    }
+
+    // Method to view all students
+    public static void viewAllStudents(Connection conn) throws SQLException {
+        String query = "SELECT * FROM Students";
+        try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+            System.out.println("\nStudents:");
+            while (rs.next()) {
+                System.out.printf("ID: %d, Name: %s, Age: %d, Grade: %s%n",
+                        rs.getInt("student_id"),
+                        rs.getString("name"),
+                        rs.getInt("age"),
+                        rs.getString("grade"));
+            }
+        }
+    }
+
+    // Method to add a new student
+    public static void addStudent(Connection conn, Scanner scanner) throws SQLException {
+        System.out.print("Enter name: ");
+        String name = scanner.next();
+        System.out.print("Enter age: ");
+        int age = scanner.nextInt();
+        System.out.print("Enter grade: ");
+        String grade = scanner.next();
+
+        String query = "INSERT INTO Students (name, age, grade) VALUES (?, ?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, name);
+            pstmt.setInt(2, age);
+            pstmt.setString(3, grade);
+            pstmt.executeUpdate();
+            System.out.println("Student added successfully.");
+        }
+    }
+
+    // Method to edit a student’s details
+    public static void editStudent(Connection conn, Scanner scanner) throws SQLException {
+        System.out.print("Enter student ID to edit: ");
+        int studentId = scanner.nextInt();
+        System.out.print("Enter new name: ");
+        String name = scanner.next();
+        System.out.print("Enter new age: ");
+        int age = scanner.nextInt();
+        System.out.print("Enter new grade: ");
+        String grade = scanner.next();
+
+        String query = "UPDATE Students SET name = ?, age = ?, grade = ? WHERE student_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, name);
+            pstmt.setInt(2, age);
+            pstmt.setString(3, grade);
+            pstmt.setInt(4, studentId);
+            int rowsUpdated = pstmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Student updated successfully.");
+            } else {
+                System.out.println("Student with ID " + studentId + " not found.");
+            }
+        }
+    }
+
+    // Method to delete a student
+    public static void deleteStudent(Connection conn, Scanner scanner) throws SQLException {
+        System.out.print("Enter student ID to delete: ");
+        int studentId = scanner.nextInt();
+
+        String query = "DELETE FROM Students WHERE student_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, studentId);
+            int rowsDeleted = pstmt.executeUpdate();
+            if (rowsDeleted > 0) {
+                System.out.println("Student deleted successfully.");
+            } else {
+                System.out.println("Student with ID " + studentId + " not found.");
+            }
+        }
+    }
+}
+
+javac StudentDatabaseNavigation.java
+
+java StudentDatabaseNavigation
+
+SELECT * FROM Students;
+
+
+
+
+
+
+Create a New Java Project in Eclipse:
+
+Open Eclipse IDE.
+Go to File > New > Java Project.
+Enter a project name (e.g., StudentDatabaseApp), then click Finish.
+Add MySQL JDBC Driver to Your Project:
+
+Right-click on the newly created project in the Project Explorer.
+Select Build Path > Configure Build Path.
+Under the Libraries tab, click Add External JARs.
+Browse to the location where you extracted the MySQL connector and select the mysql-connector-java-X.X.X.jar file.
+Click Apply and Close.
+Step 2: Create the Java Classes
+Create a New Java Class for Database Operations:
+
+Right-click on the src folder in the Project Explorer.
+Select New > Class.
+Name the class StudentDatabaseNavigation and check public static void main(String[] args) to include the main method.
+Click Finish.
+Write the Java Program for Database Operations:
+Step 3: Run the Program in Eclipse
+Compile and Run the Program:
+After writing the code, click on the Run button (green triangle) or right-click on the StudentDatabaseNavigation.java file and select Run As > Java Application.
+Interacting with the Program:
+The program will show a menu asking you to choose an operation (View, Add, Edit, Delete, or Exit).
+You can enter the necessary details as requested by the program.
+Step 4: Verify the Database
+You can verify that the records have been added, edited, or deleted by checking the Students table in MySQL.
