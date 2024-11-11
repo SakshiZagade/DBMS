@@ -1,0 +1,78 @@
+Here are the corrected MongoDB queries based on the syntax and logic corrections needed:
+
+1. **Insert Documents**:
+  
+   db.empinfo.insert({name: 'Ketki', age: 20, city: 'Mumbai'});
+   db.empinfo.insert({name: 'Shreya', age: 25, city: 'Mumbai'});
+   db.empinfo.insert({name: 'Kajal', age: 17, city: 'Chennai'});
+   db.empinfo.insert({name: 'Sudha', age: 40, city: 'Delhi'});
+   db.empinfo.insert({name: 'Aditi', age: 30, city: 'Delhi'});
+   ```
+
+2. **Show All Documents in the Collection**:
+
+   db.empinfo.find();
+   ```
+
+3. **Find All Employees from City "Mumbai"**:
+ 
+   db.empinfo.find({city: 'Mumbai'});
+   ```
+
+4. **Update the Address for Document with `id: 3`**:
+   Assuming `id` is a custom field and not MongoDB’s default `_id`:
+   
+   db.empinfo.update(
+       {id: 3},
+       {$set: {address: {street: 'JM', city: 'Pune', pin: 41143}}}
+   );
+   ```
+
+5. **Create an Array of Telephone Numbers for Document with `id: 1`**:
+  
+   db.empinfo.update(
+       {id: 1},
+       {$set: {telephone: [7766554433]}}
+   );
+   ```
+
+6. **List All Employees Whose Names Start with 'S'**:
+ 
+   db.empinfo.find({name: {$regex: '^S', $options: 'i'}});
+   ```
+
+7. **Update Document with `id: 4` with a New Name**:
+
+   db.empinfo.update(
+       {id: 4},
+       {$set: {name: 'Hetanshi'}}
+   );
+   ```
+
+8. **Increment the Salary for Document with `id: 4`**:
+  
+   db.empinfo.update(
+       {id: 4},
+       {$inc: {sal: 10}}
+   );
+   ```
+
+9. **Remove the State Information for Document with `id: 3`**:
+   
+   db.empinfo.update(
+       {id: 3},
+       {$unset: {state: ""}}
+   );
+   ```
+
+10. **Remove the Document with `name: 'Aditi'`**:
+    
+    db.empinfo.remove({name: 'Aditi'});
+    ```
+
+11. **Display All Documents in Ascending Order of Name**:
+    
+    db.empinfo.find().sort({name: 1});
+    ```
+
+These corrections ensure proper MongoDB syntax and correct logical structure for each command.
