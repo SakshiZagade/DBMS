@@ -99,3 +99,85 @@ Copy and paste the Java code from the previous response into the MongoDBCrudExam
 5. Run the Program
 Right-click on the class file > Run As > Java Application.
 The program should run and will connect to MongoDB, create the companyDB database, and the employees collection if they don’t already exist.
+import java.util.Set;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
+import java.io.*;
+public class MongoJavaConn {
+
+   public static void main(String[] args) throws Exception {
+       MongoClient mongoClient = new MongoClient();
+       DB db = mongoClient.getDB("natural");
+       int id,cost,ch,ans;
+       String name;
+       do
+       {
+       System.out.println("1:Insert document in collection" );
+       System.out.println("2:Display one document from collection " );
+       System.out.println("3:Display all document from collection " );
+    BufferedReader bufr=new BufferedReader(new InputStreamReader(System.in));
+       System.out.println("Ente choice :");
+       ch=Integer.parseInt(bufr.readLine());
+       // Get Single Collection
+       DBCollection coll = db.getCollection("myscoll");
+       switch(ch)
+       {
+       case 1:        
+       
+       // Inserting Document
+           System.out.println("Ente music id :");
+           id=Integer.parseInt(bufr.readLine());
+           System.out.println("Ente music name :");
+           name=bufr.readLine();
+           System.out.println("Ente cost :");
+           cost=Integer.parseInt(bufr.readLine());
+           
+       BasicDBObject doc = new BasicDBObject("ID", id)
+       .append("name", name).append("cost", cost);
+       coll.insert(doc);
+break;
+       case 2:    
+       // Finding First Document
+       DBObject myDoc = coll.findOne();
+       System.out.println(myDoc);
+        break;
+       case 3:    
+       // Cursor to get all documents
+       DBCursor cursor = coll.find();
+       try {
+       while (cursor.hasNext()) {
+       System.out.println(cursor.next());
+       }}
+       finally {
+       cursor.close();
+       break;
+        }
+       }
+       System.out.println("Do you wnat to continue [no-0/yes-1] :");
+       ans=Integer.parseInt(bufr.readLine());
+       }while(ans==1);
+   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
