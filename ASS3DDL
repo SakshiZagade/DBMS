@@ -1,0 +1,128 @@
+CREATE DATABASE VehicleRecords;
+
+USE VehicleRecords;
+
+1. Create person Table:
+CREATE TABLE person (
+    driver_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    address VARCHAR(255)
+);
+
+2. Create car Table:
+CREATE TABLE car (
+    license VARCHAR(15) PRIMARY KEY,
+    nm VARCHAR(100),
+    model VARCHAR(50),
+    year INT
+);
+
+3. Create owns Table:
+CREATE TABLE owns (
+    driver_id INT,
+    license VARCHAR(15),
+    PRIMARY KEY (driver_id, license),
+    FOREIGN KEY (driver_id) REFERENCES person(driver_id),
+    FOREIGN KEY (license) REFERENCES car(license)
+);
+
+4. Create accident Table:
+CREATE TABLE accident (
+    report_no INT PRIMARY KEY,
+    date DATE,
+    location VARCHAR(255)
+);
+
+5. Create participated Table:
+CREATE TABLE participated (
+    driver_id INT,
+    license VARCHAR(15),
+    report_number INT,
+    damage_amount DECIMAL(10, 2),
+    PRIMARY KEY (driver_id, license, report_number),
+    FOREIGN KEY (driver_id) REFERENCES person(driver_id),
+    FOREIGN KEY (license) REFERENCES car(license),
+    FOREIGN KEY (report_number) REFERENCES accident(report_no)
+);
+
+-INSERT INTO person (driver_id, name, address) VALUES 
+    (1, 'John Doe', '123 Maple St'),
+    (2, 'Jane Smith', '456 Oak Ave'),
+    (3, 'Alice Johnson', '789 Pine Rd'),
+    (4, 'Bob Brown', '101 Birch Blvd'),
+    (5, 'Charlie Green', '202 Cedar St'),
+    (6, 'Diana Prince', '303 Spruce Ln');
+
+-INSERT INTO car (license, nm, model, year) VALUES 
+    ('ABC123', 'Toyota', 'Corolla', 2018),
+    ('XYZ456', 'Honda', 'Civic', 2020),
+    ('LMN789', 'Ford', 'Focus', 2019),
+    ('PQR234', 'Chevrolet', 'Malibu', 2017),
+    ('TUV567', 'Nissan', 'Sentra', 2021),
+    ('JKL890', 'BMW', 'X5', 2022);
+
+-INSERT INTO owns (driver_id, license) VALUES 
+    (1, 'ABC123'),
+    (2, 'XYZ456'),
+    (3, 'LMN789'),
+    (4, 'PQR234'),
+    (5, 'TUV567'),
+    (6, 'JKL890');
+
+-INSERT INTO accident (report_no, date, location) VALUES 
+    (101, '2023-01-10', 'Main St & 1st Ave'),
+    (102, '2023-02-15', 'Elm St & 5th Ave'),
+    (103, '2023-03-20', 'Maple St & 2nd Ave'),
+    (104, '2023-04-25', 'Pine Rd & 3rd Ave'),
+    (105, '2023-05-30', 'Oak Ave & 6th Ave'),
+    (106, '2023-06-05', 'Cedar St & 7th Ave');
+
+-INSERT INTO participated (driver_id, license, report_number, damage_amount) VALUES 
+    (1, 'ABC123', 101, 2000.50),
+    (2, 'XYZ456', 102, 1500.00),
+    (3, 'LMN789', 103, 3000.75),
+    (4, 'PQR234', 104, 500.25),
+    (5, 'TUV567', 105, 750.60),
+    (6, 'JKL890', 106, 1000.90);
+
+6. Create Index on car using the license attribute:
+CREATE INDEX idx_license ON car(license);
+
+7. Create Index on person using the driver_id attribute:
+CREATE INDEX idx_driver_id ON person(driver_id);
+
+8. Show All Indexes on person:
+SHOW INDEX FROM person;
+
+9. Drop Index idx_driver_id from person:
+DROP INDEX idx_driver_id ON person;
+
+10. Create a View for Cars Participated in Accidents:
+CREATE VIEW CarAccidents AS
+SELECT car.license, car.nm, car.model, car.year, accident.report_no, accident.date, accident.location, participated.damage_amount
+FROM car
+JOIN participated ON car.license = participated.license
+JOIN accident ON participated.report_number = accident.report_no;
+
+-Display the CarAccidents View:
+SELECT * FROM CarAccidents;
+
+-Create a View for Persons Who Own Cars:
+CREATE VIEW PersonCarOwnership AS
+SELECT person.driver_id, person.name, car.license, car.nm, car.model, car.year
+FROM person
+JOIN owns ON person.driver_id = owns.driver_id
+JOIN car ON owns.license = car.license;
+
+11. Display the PersonCarOwnership View:
+SELECT * FROM PersonCarOwnership;
+
+12. Create a View to Display Driver Name, Car Model, and Year:
+CREATE VIEW DriverCarInfo AS
+SELECT person.name AS driver_name, car.model, car.year
+FROM person
+JOIN owns ON person.driver_id = owns.driver_id
+JOIN car ON owns.license = car.license;
+
+-Display the DriverCarInfo View:
+SELECT * FROM DriverCarInfo;
